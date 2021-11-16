@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, TouchableOpacit } from 'react-native';
+import { View, Text, Image, TouchableOpacity, FlatList } from 'react-native';
 import { WebView } from 'react-native-webview';
 import styles from '../styles/components';
 import { getShowInfo } from '../api';
-import { Show } from '../models';
+import { Episode, Show } from '../models';
 
 export const Home = ({ navigation }) => {
   const [showInfo, setShowInfo] = useState<Partial<Show>>({});
@@ -15,6 +15,16 @@ export const Home = ({ navigation }) => {
     };
     fetchShowInfo();
   }, []);
+
+  const renderEpisodeTitle = ({ item }) => {
+    const { name, season, number } = item;
+    const episodeTitle = `${season}x${number} - ${name}`;
+    return (
+      <TouchableOpacity>
+        <Text>{episodeTitle}</Text>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={styles.rootContainer}>
@@ -34,15 +44,13 @@ export const Home = ({ navigation }) => {
           />
         </View>
       </View>
-      <View style={styles.episodesContainer}></View>
-      {/* <TouchableOpacity
-        onPress={() => {
-          navigation.navigate('Details');
-        }}
-        style={styles.baseButton}
-      >
-        <Text>Go to Details</Text>
-      </TouchableOpacity> */}
+      <View style={styles.episodesContainer}>
+        <FlatList
+          data={showInfo._embedded?.episodes}
+          renderItem={renderEpisodeTitle}
+          keyExtractor={(episode) => episode.id}
+        />
+      </View>
     </View>
   );
 };

@@ -6,7 +6,7 @@ export interface Show {
     medium?: string;
     original?: string;
   };
-  embedded: {
+  _embedded: {
     episodes?: Episode[];
   };
 }
@@ -15,6 +15,8 @@ export interface Episode {
   id: number;
   name: string;
   summary: string;
+  season: number;
+  number: number;
   image: {
     medium?: string;
     original?: string;
