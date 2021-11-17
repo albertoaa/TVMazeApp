@@ -3,7 +3,7 @@ import { View, Text, Image, TouchableOpacity, FlatList } from 'react-native';
 import { WebView } from 'react-native-webview';
 import styles from '../styles/components';
 import { getShowInfo } from '../api';
-import { Episode, Show } from '../models';
+import { Show } from '../models';
 
 export const Home = ({ navigation }) => {
   const [showInfo, setShowInfo] = useState<Partial<Show>>({});
@@ -17,11 +17,25 @@ export const Home = ({ navigation }) => {
   }, []);
 
   const renderEpisodeTitle = ({ item }) => {
-    const { name, season, number } = item;
+    const { id, name, summary, season, number, image } = item;
+    const episode = {
+      id,
+      name,
+      summary,
+      season,
+      number,
+      image: image,
+    };
+
     const episodeTitle = `${season}x${number} - ${name}`;
     return (
-      <TouchableOpacity>
-        <Text>{episodeTitle}</Text>
+      <TouchableOpacity
+        onPress={() =>
+          navigation.navigate('Details', { episode: JSON.stringify(episode) })
+        }
+        style={styles.episodeItem}
+      >
+        <Text style={styles.showNameText}>{episodeTitle}</Text>
       </TouchableOpacity>
     );
   };
@@ -34,7 +48,9 @@ export const Home = ({ navigation }) => {
           source={{ uri: showInfo.image?.original || showInfo.image?.medium }}
         />
         <View style={styles.basicInfo}>
-          <Text style={styles.showNameText}>{showInfo.name}</Text>
+          <Text style={[styles.showNameText, styles.textBold]}>
+            {showInfo.name}
+          </Text>
           <WebView
             originWhitelist={['*']}
             style={styles.summaryContainer}

@@ -19,6 +19,12 @@ const styles = StyleSheet.create({
     flex: 3,
     resizeMode: 'cover',
   },
+  detailsImage: {
+    width: '100%',
+    height: '100%',
+    flex: 1,
+    resizeMode: 'contain',
+  },
   basicInfoContainer: {
     flex: 4,
     flexDirection: 'row',
@@ -31,17 +37,27 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     borderWidth: 1,
   },
+  textBold: {
+    fontWeight: 'bold',
+  },
   showNameText: {
     paddingLeft: 6,
     fontSize: 18,
-    fontWeight: 'bold',
   },
 
   summaryContainer: {
     flex: 1,
+    width: '100%',
   },
   episodesContainer: {
+    marginVertical: 20,
     flex: 7,
+  },
+  episodeItem: {
+    paddingVertical: 10,
+    marginVertical: 5,
+    borderColor: '#ddd',
+    borderWidth: 1,
   },
 });
 
