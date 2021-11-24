@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   basicInfoContainer: {
-    flex: 4,
+    height: 200,
     flexDirection: 'row',
     marginTop: 10,
   },

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   View,
+  Dimensions,
   Text,
   Image,
   TouchableOpacity,
@@ -13,6 +14,8 @@ import { getShowInfo } from '../api';
 import { Show } from '../models';
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
+const { height: wHeight } = Dimensions.get('window');
+const height = wHeight - 200;
 
 export const Home = ({ navigation }) => {
   const [showInfo, setShowInfo] = useState<Partial<Show>>({});
@@ -32,14 +35,28 @@ export const Home = ({ navigation }) => {
 
   const EpisodeItem = ({ index, item, y }) => {
     const { id, name, summary, season, number, image } = item;
+    const position = Animated.subtract(index * 72, y);
+    const isDisappearing = -72;
+    const isTop = 0;
+    const isBottom = height - 72;
+    const isAppearing = height;
     const translateY = Animated.add(
       y,
       y.interpolate({
-        inputRange: [0, 0.00001 + index * 60],
-        outputRange: [0, -index * 60],
+        inputRange: [0, 0.00001 + index * 72],
+        outputRange: [0, -index * 72],
         extrapolateRight: 'clamp',
       })
     );
+    const scale = position.interpolate({
+      inputRange: [isDisappearing, isTop, isBottom, isAppearing],
+      outputRange: [0.5, 1, 1, 0.5],
+      extrapolate: 'clamp',
+    });
+    const opacity = position.interpolate({
+      inputRange: [isDisappearing, isTop, isBottom, isAppearing],
+      outputRange: [0.5, 1, 1, 0.5],
+    });
     const episode = {
       id,
       name,
@@ -49,15 +66,26 @@ export const Home = ({ navigation }) => {
       image: image,
     };
 
-    const episodeTitle = `${season}x${number} - ${name}`;
+    const episodeNumber = `${season}x${number}`;
+    const episodeTitle = `${name}`;
     return (
-      <Animated.View style={[{ transform: [{ translateY }] }]}>
-        <TouchableOpacity style={styles.episodeItem}>
+      <Animated.View
+        style={[{ opacity, transform: [{ translateY }, { scale }] }]}
+      >
+        <TouchableOpacity
+          style={styles.episodeItem}
+          onPress={() =>
+            navigation.navigate('Details', { episode: JSON.stringify(episode) })
+          }
+        >
           <Image
             style={styles.listImage}
             source={{ uri: episode.image?.original || episode.image?.medium }}
           />
-          <Text style={styles.showNameText}>{episodeTitle}</Text>
+          <View style={{ flexDirection: 'column' }}>
+            <Text style={styles.showNameText}>{episodeNumber}</Text>
+            <Text style={styles.showNameText}>{episodeTitle}</Text>
+          </View>
         </TouchableOpacity>
       </Animated.View>
     );
