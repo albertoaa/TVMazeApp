@@ -25,6 +25,11 @@ const styles = StyleSheet.create({
     flex: 1,
     resizeMode: 'contain',
   },
+  listImage: {
+    width: 80,
+    height: 60,
+    resizeMode: 'cover',
+  },
   basicInfoContainer: {
     flex: 4,
     flexDirection: 'row',
@@ -51,13 +56,18 @@ const styles = StyleSheet.create({
   },
   episodesContainer: {
     marginVertical: 20,
+    width: '100%',
     flex: 7,
   },
   episodeItem: {
-    paddingVertical: 10,
+    flex: 1,
+    flexDirection: 'row',
+    width: '100%',
     marginVertical: 5,
     borderColor: '#ddd',
     borderWidth: 1,
+    alignItems: 'center',
+    backgroundColor: '#fff',
   },
 });
 

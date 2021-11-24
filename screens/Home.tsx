@@ -1,23 +1,45 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, TouchableOpacity, FlatList } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  FlatList,
+  Animated,
+} from 'react-native';
 import { WebView } from 'react-native-webview';
 import styles from '../styles/components';
 import { getShowInfo } from '../api';
 import { Show } from '../models';
 
+const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
+
 export const Home = ({ navigation }) => {
   const [showInfo, setShowInfo] = useState<Partial<Show>>({});
 
+  const y = new Animated.Value(0);
+  const onScroll = Animated.event([{ nativeEvent: { contentOffset: { y } } }], {
+    useNativeDriver: true,
+  });
+
   useEffect(() => {
     const fetchShowInfo = async () => {
-      const data = await getShowInfo('powerpuff', true);
+      const data = await getShowInfo('24', true);
       setShowInfo(data);
     };
     fetchShowInfo();
   }, []);
 
-  const renderEpisodeTitle = ({ item }) => {
+  const EpisodeItem = ({ index, item, y }) => {
     const { id, name, summary, season, number, image } = item;
+    const translateY = Animated.add(
+      y,
+      y.interpolate({
+        inputRange: [0, 0.00001 + index * 60],
+        outputRange: [0, -index * 60],
+        extrapolateRight: 'clamp',
+      })
+    );
     const episode = {
       id,
       name,
@@ -29,14 +51,15 @@ export const Home = ({ navigation }) => {
 
     const episodeTitle = `${season}x${number} - ${name}`;
     return (
-      <TouchableOpacity
-        onPress={() =>
-          navigation.navigate('Details', { episode: JSON.stringify(episode) })
-        }
-        style={styles.episodeItem}
-      >
-        <Text style={styles.showNameText}>{episodeTitle}</Text>
-      </TouchableOpacity>
+      <Animated.View style={[{ transform: [{ translateY }] }]}>
+        <TouchableOpacity style={styles.episodeItem}>
+          <Image
+            style={styles.listImage}
+            source={{ uri: episode.image?.original || episode.image?.medium }}
+          />
+          <Text style={styles.showNameText}>{episodeTitle}</Text>
+        </TouchableOpacity>
+      </Animated.View>
     );
   };
 
@@ -61,10 +84,14 @@ export const Home = ({ navigation }) => {
         </View>
       </View>
       <View style={styles.episodesContainer}>
-        <FlatList
+        <AnimatedFlatList
+          scrollEventThrottle={16}
           data={showInfo._embedded?.episodes}
-          renderItem={renderEpisodeTitle}
+          renderItem={({ index, item }) => (
+            <EpisodeItem index={index} item={item} y={y} />
+          )}
           keyExtractor={(episode) => episode.id}
+          {...{ onScroll }}
         />
       </View>
     </View>
